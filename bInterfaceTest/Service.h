@@ -20,8 +20,8 @@ class Service
 private:
 	const char * host = "127.0.0.1"; //因为是作为本机测试，所以填写的是本地IP 
 	const char * user = "root"; //这里改为你的用户名，即连接MySQL的用户名 
-	const char * passwd = "123456"; //这里改为你的用户密码 
-	const char * db = "student"; //这里改为你要连接的数据库的名字,一个数据可能有几张表
+	const char * passwd = "1234"; //这里改为你的用户密码 
+	const char * db = "binterface"; //这里改为你要连接的数据库的名字,一个数据可能有几张表
 	const unsigned int port = 3306; //这是MySQL的服务器的端口，如果你没有修改过的话就是3306。 
 	const char * unix_socket = NULL; //unix_socket这是unix下的，我在Windows下，所以就把它设置为NULL 
 	const unsigned int codeArray[7] = { 101,203,205,303,305,603,605 };
@@ -48,4 +48,10 @@ public:
 private:
 	int checkRoot(TiXmlDocument&,CString&);
 	bool check101(TiXmlDocument&, CString&);
+	bool check203(TiXmlDocument&, CString&);
+	bool check205(TiXmlDocument&, CString&);
+	bool check303(TiXmlDocument&, CString&);
+	bool check305(TiXmlDocument&, CString&);
+	bool check603(TiXmlDocument&, CString&);
+	bool check605(TiXmlDocument&, CString&);
 };

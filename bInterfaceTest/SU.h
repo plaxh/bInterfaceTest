@@ -1,6 +1,8 @@
 #pragma once
-#include <map>
+
 #include "Device.h"
+#include <map>
+
 class SU
 {
 public:

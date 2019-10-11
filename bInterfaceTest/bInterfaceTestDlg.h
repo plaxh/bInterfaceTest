@@ -5,6 +5,8 @@
 #pragma once
 
 #define MY_MSG_UPDATEDISPLAY WM_USER+1
+#define MY_MSG_REGIST WM_USER+2
+
 
 // CbInterfaceTestDlg 对话框
 class CbInterfaceTestDlg : public CDialogEx
@@ -34,6 +36,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	afx_msg LRESULT DisplayTest(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT DisplayTree(WPARAM wParam, LPARAM lParam);
 public:
 	
 
@@ -42,4 +45,8 @@ public:
 	afx_msg void OnClose();
 	bool m_InService;
 	afx_msg void OnBnClickedButtonSuspend();
+	// 指令序列
+	CTreeCtrl m_CMD_Tree;
+	afx_msg void OnTvnSelchangedCmdTree(NMHDR *pNMHDR, LRESULT *pResult);
+	CTreeCtrl m_Property_Tree;
 };

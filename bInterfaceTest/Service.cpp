@@ -7,7 +7,12 @@ extern CRITICAL_SECTION g_logSection;
 Service::Service()
 {
 	mysql = MYSQL();
+	mysql_init(&mysql);
 	sock = NULL;
+	while (!sock){
+		sock = mysql_real_connect(&mysql, host,
+			user, passwd, db, port, unix_socket, client_flag);
+	}
 	pSU = NULL;
 }
 
@@ -23,10 +28,7 @@ Service::~Service()
 bool Service::sqlRequest(char* query)
 {
 	// TODO: 在此处添加实现代码.
-	mysql_init(&mysql);
-	sock = mysql_real_connect(&mysql, host, 
-		user, passwd, db, port, unix_socket, client_flag);
-	if (!sock) return false;
+	
 	if (mysql_query(&mysql, query) != 0) return false;
 	if ((result = mysql_store_result(&mysql)) == NULL) 
 		return false;
@@ -42,10 +44,11 @@ void Service::print(const std::string & xmlData)
 	pwText = new wchar_t[dwNum + 1];
 	memset(pwText, 0, dwNum * 2 + 2);
 	MultiByteToWideChar(CP_UTF8, 0, xmlData.c_str(), -1, pwText, dwNum);
-	HWND Hwnd = ::FindWindow(NULL, _T("B接口测试工具"));
+	
 	EnterCriticalSection(&g_logSection);
 	m_Log.AppendFormat(_T("%s\r\n"),pwText);
 	LeaveCriticalSection(&g_logSection);
+	HWND Hwnd = ::FindWindow(NULL, _T("B接口测试工具"));
 	SendMessageW(Hwnd, MY_MSG_UPDATEDISPLAY, 0, 0);
 }
 
@@ -59,7 +62,7 @@ void Service::print(CString & resultData)
 }
 
 
-bool Service::resolv(const std::string &xmlData,CString& result_XML, std::string &_invokeReturn)
+bool Service::resolv(const std::string &xmlData, CString& result_XML, std::string &_invokeReturn)
 {
 	// TODO: 在此处添加实现代码.
 	TiXmlDocument doc;
@@ -74,29 +77,97 @@ bool Service::resolv(const std::string &xmlData,CString& result_XML, std::string
 	switch (code)
 	{
 	case 101:
-		
 		if (check101(doc, result_XML))
+		{
 			_invokeReturn = "sucess";
+			return true;
+		}
 		else
+		{
 			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	case 203:
+		if (check203(doc, result_XML))
+		{
+			_invokeReturn = "sucess";
+			return true;
+		}
+		else
+		{
+			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	case 205:
+		if (check205(doc, result_XML))
+		{
+			_invokeReturn = "sucess";
+			return true;
+		}
+		else
+		{
+			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	case 303:
+		if (check303(doc, result_XML))
+		{
+			_invokeReturn = "sucess";
+			return true;
+		}
+		else
+		{
+			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	case 305:
+		if (check305(doc, result_XML))
+		{
+			_invokeReturn = "sucess";
+			return true;
+		}
+		else
+		{
+			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	case 603:
+		if (check603(doc, result_XML))
+		{
+			_invokeReturn = "sucess";
+			return true;
+		}
+		else
+		{
+			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	case 605:
+		if (check605(doc, result_XML))
+		{
+			_invokeReturn = "sucess";
+			return true;
+		}
+		else
+		{
+			_invokeReturn = "failure";
+			return false;
+		}
 		break;
 	default:
 		break;
+		
 	}
-	return true;
+	return false;
 }
+	
+	
 
 
 int Service::checkRoot(TiXmlDocument& doc,CString & result_XML)
@@ -275,7 +346,24 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 		}
 		else
 		{
-			(*pSU->pDeviceMap)[Id] = new Device(Id, RId);
+			CString query;
+			query.Format(_T("select DeviceCategory from idlist where DeviceId = '%s' limit 1;"), Id.Left(3));
+			USES_CONVERSION;
+			char* charQuery = T2A(query.GetBuffer(0));
+			query.ReleaseBuffer();
+
+			
+			if (sqlRequest(charQuery))
+			{
+				(*pSU->pDeviceMap)[Id] = new Device(Id, RId);
+			}
+			else
+			{
+				checkResult.Format(_T("Device编码:%s在数据库中不存在！"), Id);
+				delete pSU; pSU = NULL;
+				return false;
+			}
+			
 		}
 			
 		child_node = child_node->NextSiblingElement("Device");
@@ -290,3 +378,39 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 	return true;
 }
 
+bool Service::check203(TiXmlDocument& doc, CString& checkResult)
+{
+	// TODO: 在此处添加实现代码.
+
+	return true;
+}
+bool Service::check205(TiXmlDocument& doc, CString& checkResult)
+{
+	// TODO: 在此处添加实现代码.
+
+	return true;
+}
+bool Service::check303(TiXmlDocument& doc, CString& checkResult)
+{
+	// TODO: 在此处添加实现代码.
+
+	return true;
+}
+bool Service::check305(TiXmlDocument& doc, CString& checkResult)
+{
+	// TODO: 在此处添加实现代码.
+
+	return true;
+}
+bool Service::check603(TiXmlDocument& doc, CString& checkResult)
+{
+	// TODO: 在此处添加实现代码.
+
+	return true;
+}
+bool Service::check605(TiXmlDocument& doc, CString& checkResult)
+{
+	// TODO: 在此处添加实现代码.
+
+	return true;
+}

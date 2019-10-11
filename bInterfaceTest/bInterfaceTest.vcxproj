@@ -93,11 +93,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Program Files\mysql-8.0.17-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\MySQL\MySQL Server 5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\Program Files\mysql-8.0.17-winx64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\MySQL\MySQL Server 5.5\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
@@ -118,11 +118,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Program Files\mysql-8.0.17-winx64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\MySQL\MySQL Server 5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>D:\Program Files\mysql-8.0.17-winx64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\MySQL\MySQL Server 5.5\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
@@ -191,6 +191,7 @@
   <ItemGroup>
     <ClInclude Include="bInterfaceTest.h" />
     <ClInclude Include="bInterfaceTestDlg.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SCService.h" />
@@ -211,6 +212,7 @@
   <ItemGroup>
     <ClCompile Include="bInterfaceTest.cpp" />
     <ClCompile Include="bInterfaceTestDlg.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Service.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>

@@ -6,6 +6,7 @@ extern CRITICAL_SECTION g_logSection;
 
 Service::Service()
 {
+	
 	mysql = MYSQL();
 	mysql_init(&mysql);
 	sock = NULL;
@@ -61,14 +62,14 @@ void Service::print(CString & resultData)
 	SendMessageW(Hwnd, MY_MSG_UPDATEDISPLAY, 0, 0);
 }
 
-
-bool Service::resolv(const std::string &xmlData, CString& result_XML, std::string &_invokeReturn)
+//处理接收到的报文，xmldata接受到的报文，_invokeReturn用于soap返回
+bool Service::dispatch(const std::string &xmlData, std::string &_invokeReturn)
 {
 	// TODO: 在此处添加实现代码.
 	TiXmlDocument doc;
-
+	receiveLog = "";
 	doc.Parse(xmlData.c_str());
-	int code = this->checkRoot(doc, result_XML);
+	int code = this->checkRoot(doc);
 	if (!code)
 	{
 		_invokeReturn = "failure";
@@ -77,7 +78,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 	switch (code)
 	{
 	case 101:
-		if (check101(doc, result_XML))
+		if (check101(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -89,7 +90,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 		}
 		break;
 	case 203:
-		if (check203(doc, result_XML))
+		if (check203(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -101,7 +102,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 		}
 		break;
 	case 205:
-		if (check205(doc, result_XML))
+		if (check205(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -113,7 +114,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 		}
 		break;
 	case 303:
-		if (check303(doc, result_XML))
+		if (check303(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -125,7 +126,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 		}
 		break;
 	case 305:
-		if (check305(doc, result_XML))
+		if (check305(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -137,7 +138,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 		}
 		break;
 	case 603:
-		if (check603(doc, result_XML))
+		if (check603(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -149,7 +150,7 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 		}
 		break;
 	case 605:
-		if (check605(doc, result_XML))
+		if (check605(doc))
 		{
 			_invokeReturn = "sucess";
 			return true;
@@ -170,30 +171,30 @@ bool Service::resolv(const std::string &xmlData, CString& result_XML, std::strin
 	
 
 
-int Service::checkRoot(TiXmlDocument& doc,CString & result_XML)
+int Service::checkRoot(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 	TiXmlElement* root_node = doc.RootElement();
 	if (!root_node) {
-		result_XML = _T("根节点解析失败，请确定xml报文格式正确！");
+		receiveLog = _T("根节点解析失败，请确定xml报文格式正确！");
 		return 0;
 	}
 	TiXmlElement* child_node = root_node->FirstChildElement("PK_Type");
 	if (!child_node) {
-		result_XML = _T("PK_Type节点解析错误！");
+		receiveLog = _T("PK_Type节点解析错误！");
 		return 0;
 	}
 
 	child_node = child_node->FirstChildElement("Name");
 	if (!child_node) {
-		result_XML = _T("Name节点解析错误！");
+		receiveLog = _T("Name节点解析错误！");
 		return 0;
 	}
 	std::string name(child_node->GetText());
 
 	child_node = child_node->NextSiblingElement("Code");
 	if (!child_node) {
-		result_XML = _T("Code节点解析错误！");
+		receiveLog = _T("Code节点解析错误！");
 		return 0;
 	}
 	int code = atoi(child_node->GetText());
@@ -205,14 +206,14 @@ int Service::checkRoot(TiXmlDocument& doc,CString & result_XML)
 	}
 	if (nameArray[index] != name)
 	{
-		result_XML = _T("指令名称与指令编号不匹配！");
+		receiveLog = _T("指令名称与指令编号不匹配！");
 		return 0;
 	}
 	return code;
 }
 
 
-bool Service::check101(TiXmlDocument& doc, CString& checkResult)
+bool Service::check101(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 	
@@ -220,7 +221,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 	TiXmlElement *Info_node = root_node->FirstChildElement("Info");
 	if (!Info_node)
 	{
-		checkResult = _T("Info节点解析错误！");
+		receiveLog = _T("Info节点解析错误！");
 		return false;
 	}
 	
@@ -232,7 +233,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 		if (!child_node)
 		{
 			delete pSU; pSU = NULL;
-			checkResult = _T("SUId节点解析错误！");
+			receiveLog = _T("SUId节点解析错误！");
 			return false;
 		}
 		if ((pSU->SUId) == CString(child_node->GetText()))
@@ -240,13 +241,13 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 			child_node = Info_node->FirstChildElement("SUConfigTime");
 			if (!child_node)
 			{
-				checkResult = _T("SUConfigTime节点解析错误！");
+				receiveLog = _T("SUConfigTime节点解析错误！");
 				delete pSU; pSU = NULL;
 				return false;
 			}
 			if ((pSU->SUConfigTime) == CString(child_node->GetText()))
 			{
-				checkResult += _T("SU重复登录。");
+				receiveLog += _T("SU重复登录。");
 				nodeExist(UserName);
 				nodeExist(PassWord);
 				nodeExist(SURId);
@@ -261,7 +262,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 			}
 			else
 			{
-				checkResult += _T("SU更新登录，数据更新。");
+				receiveLog += _T("SU更新登录，数据更新。");
 				delete pSU;
 				pSU = new SU();
 			}
@@ -269,7 +270,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 		}
 		else
 		{
-			checkResult = _T("错误！该工具同时仅能测试一台SU设备！");
+			receiveLog = _T("错误！该工具同时仅能测试一台SU设备！");
 			return false;
 		}
 
@@ -307,7 +308,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 	nodeExist(DeviceList);
 	if(pSU->pDeviceMap)
 	{
-		checkResult = _T("DeviceList重复错误！");
+		receiveLog = _T("DeviceList重复错误！");
 		delete pSU; pSU = NULL;
 		return false;
 	}else
@@ -315,7 +316,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 	child_node = child_node->FirstChildElement("Device");
 	if (!child_node)
 	{
-		checkResult = _T("Device节点解析错误！"); 
+		receiveLog = _T("Device节点解析错误！");
 		delete pSU;pSU = NULL;
 		return false;
 	}
@@ -325,7 +326,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 		CString RId(child_node->Attribute("RId"));
 		if(Id=="")
 		{
-			checkResult = _T("Device节点Id属性解析错误！");
+			receiveLog = _T("Device节点Id属性解析错误！");
 			delete pSU; pSU = NULL;
 			return false;
 			
@@ -333,14 +334,14 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 		
 		if (RId == "")
 		{
-			checkResult = _T("Device节点RId属性解析错误！");
+			receiveLog = _T("Device节点RId属性解析错误！");
 			delete pSU; pSU = NULL;
 			return false;
 
 		}
 		if ((*pSU->pDeviceMap)[Id])
 		{
-			checkResult.Format(_T("Device编码:%s重复！"),Id);
+			receiveLog.Format(_T("Device编码:%s重复！"),Id);
 			delete pSU; pSU = NULL;
 			return false;
 		}
@@ -359,7 +360,7 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 			}
 			else
 			{
-				checkResult.Format(_T("Device编码:%s在数据库中不存在！"), Id);
+				receiveLog.Format(_T("Device编码:%s在数据库中不存在！"), Id);
 				delete pSU; pSU = NULL;
 				return false;
 			}
@@ -370,45 +371,45 @@ bool Service::check101(TiXmlDocument& doc, CString& checkResult)
 	}
 
 
-	checkResult.Format(_T("登陆成功\r\n"));
-	checkResult.AppendFormat(_T("SUId:\t\t%s\r\nSURId：\t\t%s\r\n用户名：\t\t%s\r\n密码：\t\t%s\r\nSUIP：\t\t%s\r\nSU端口号：\t%d\r\nSU生产厂家：\t%s\r\nSU型号：\t\t%s\r\nSU硬件版本号：\t%s\r\n配置时间：\t%s\r\nSU版本号：\t%.1f\r\n")
+	receiveLog.Format(_T("登陆成功\r\n"));
+	receiveLog.AppendFormat(_T("SUId:\t\t%s\r\nSURId：\t\t%s\r\n用户名：\t\t%s\r\n密码：\t\t%s\r\nSUIP：\t\t%s\r\nSU端口号：\t%d\r\nSU生产厂家：\t%s\r\nSU型号：\t\t%s\r\nSU硬件版本号：\t%s\r\n配置时间：\t%s\r\nSU版本号：\t%.1f\r\n")
 		, pSU->SUId, pSU->SURId, pSU->UserName, pSU->PassWord, pSU->SUIP
 		, pSU->SUPort, pSU->SUVendor, pSU->SUModel, pSU->SUHardVer
 		, pSU->SUConfigTime, pSU->SUVer);
 	return true;
 }
 
-bool Service::check203(TiXmlDocument& doc, CString& checkResult)
+bool Service::check203(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 
 	return true;
 }
-bool Service::check205(TiXmlDocument& doc, CString& checkResult)
+bool Service::check205(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 
 	return true;
 }
-bool Service::check303(TiXmlDocument& doc, CString& checkResult)
+bool Service::check303(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 
 	return true;
 }
-bool Service::check305(TiXmlDocument& doc, CString& checkResult)
+bool Service::check305(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 
 	return true;
 }
-bool Service::check603(TiXmlDocument& doc, CString& checkResult)
+bool Service::check603(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 
 	return true;
 }
-bool Service::check605(TiXmlDocument& doc, CString& checkResult)
+bool Service::check605(TiXmlDocument& doc)
 {
 	// TODO: 在此处添加实现代码.
 

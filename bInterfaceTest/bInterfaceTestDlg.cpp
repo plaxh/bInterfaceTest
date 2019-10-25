@@ -191,16 +191,16 @@ HCURSOR CbInterfaceTestDlg::OnQueryDragIcon()
 int SCServiceSoapBindingService::invoke(const std::string& _xmlData, std::string &_invokeReturn)
 {
 	soapResolv.print(_xmlData);
-	CString result("");
 	
-	if (soapResolv.resolv(_xmlData, result, _invokeReturn))
+	
+	if (soapResolv.dispatch(_xmlData, _invokeReturn))
 	{
-		soapResolv.print(result);
+		soapResolv.print(soapResolv.receiveLog);
 		HWND Hwnd = ::FindWindow(NULL, _T("B接口测试工具"));
 		SendMessageW(Hwnd, MY_MSG_REGIST, 1, 0);
 	}
 	else
-		soapResolv.print(result);
+		soapResolv.print(soapResolv.receiveLog);
 	return SOAP_OK;
 }
 

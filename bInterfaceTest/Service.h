@@ -9,7 +9,7 @@
 #define nodeExist(nodename) child_node = Info_node->FirstChildElement(#nodename);\
 if (!child_node)\
 {\
-	checkResult = _T(#nodename##"节点解析错误！");\
+	receiveLog = _T(#nodename##"节点解析错误！");\
 	delete pSU;pSU = NULL;\
 	return false;\
 }\
@@ -37,21 +37,21 @@ public:
 	MYSQL_RES *result;
 	MYSQL_ROW row;
 	SU* pSU;
-
+	CString receiveLog; //用于显示在窗口中，表示接收到报文的解析结果
 public:
 	Service();
 	~Service();
 	bool sqlRequest(char*);
 	void print(const std::string &);
 	void print(CString &);
-	bool resolv(const std::string &,CString &, std::string &);
+	bool dispatch(const std::string &,std::string &);
 private:
-	int checkRoot(TiXmlDocument&,CString&);
-	bool check101(TiXmlDocument&, CString&);
-	bool check203(TiXmlDocument&, CString&);
-	bool check205(TiXmlDocument&, CString&);
-	bool check303(TiXmlDocument&, CString&);
-	bool check305(TiXmlDocument&, CString&);
-	bool check603(TiXmlDocument&, CString&);
-	bool check605(TiXmlDocument&, CString&);
+	int checkRoot(TiXmlDocument&);
+	bool check101(TiXmlDocument&);
+	bool check203(TiXmlDocument&);
+	bool check205(TiXmlDocument&);
+	bool check303(TiXmlDocument&);
+	bool check305(TiXmlDocument&);
+	bool check603(TiXmlDocument&);
+	bool check605(TiXmlDocument&);
 };
